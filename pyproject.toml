@@ -1,0 +1,23 @@
+[project]
+name = "astracrew"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Pritish-23", email = "pritishsharma08@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "crewai>=1.15.21",
+    "fastapi>=0.141.1",
+    "pydantic>=2.0",
+    "python-dotenv>=1.2.3",
+    "uvicorn>=0.52.4",
+]
+
+[project.scripts]
+astracrew = "astracrew:main"
+
+[build-system]
+requires = ["uv_build>=0.12.13,<0.13.0"]
+build-backend = "uv_build"
