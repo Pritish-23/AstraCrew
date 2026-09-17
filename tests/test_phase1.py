@@ -1,11 +1,3 @@
-import os
-import sys
-
-# Ensure project root is in sys.path regardless of execution method
-sys.path.insert(
-    0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-)
-
 from datetime import datetime, timezone
 from schemas.models import (
     AstraCrewAuditReport,
