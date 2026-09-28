@@ -1,0 +1,30 @@
+# AstraCrew: Core Agentic Framework & Data Contracts
+crewai>=0.80.0
+crewai-tools>=0.12.0
+pydantic>=2.7.0
+python-dotenv>=1.0.1
+pyyaml>=6.0.1
+
+# LLM Providers & Inference Client
+openai>=1.40.0
+
+# Target Environments & HTTP Middleware
+fastapi>=0.110.0
+starlette>=0.37.0
+uvicorn>=0.30.0
+requests>=2.32.0
+
+# Retrieval-Augmented Generation (RAG Target)
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+
+# Reporting, Visualization & Web Dashboard
+streamlit>=1.35.0
+plotly>=5.22.0
+reportlab>=4.2.0
+
+# Development, Linting & Automated Testing
+pytest>=8.2.0
+pytest-asyncio>=0.23.0
+ruff>=0.5.0
+mypy>=1.10.0

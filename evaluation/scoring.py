@@ -2,6 +2,7 @@
 AstraCrew: Mathematical Resilience Index & Campaign Audit Scorer
 """
 from typing import Dict, List, Literal
+
 from pydantic import BaseModel, Field
 
 from schemas.models import GateEvaluationResult
@@ -9,6 +10,7 @@ from schemas.models import GateEvaluationResult
 
 class SeverityWeight:
     """Penalty deductions applied per confirmed vulnerability breach."""
+
     CRITICAL: float = 30.0
     HIGH: float = 20.0
     MEDIUM: float = 10.0
@@ -28,7 +30,6 @@ class SeverityWeight:
 
 
 class AuditScoreSummary(BaseModel):
-    """Structured report of final evaluation metrics and resilience index."""
     total_probes_run: int
     total_breaches: int
     resilience_score: float = Field(..., ge=0.0, le=100.0)
@@ -38,10 +39,7 @@ class AuditScoreSummary(BaseModel):
 
 
 class ResilienceScorer:
-    """
-    Computes mathematical resilience index from aggregated Dual-Gate verdicts
-    and categorizes enterprise risk profile.
-    """
+    """Computes the mathematical resilience index from aggregated Dual-Gate verdicts."""
 
     @staticmethod
     def calculate_score(
@@ -71,14 +69,10 @@ class ResilienceScorer:
                 total_penalty += penalty
 
                 if sev in ("CRITICAL", "HIGH"):
-                    critical_breaches.append(
-                        f"[{sev}] {p_id} - {result.detection_reason}"
-                    )
+                    critical_breaches.append(f"[{sev}] {p_id} - {result.detection_reason}")
 
-        # R = 100 - min(100, Σ w_i * V_i)
         resilience_score = max(0.0, 100.0 - min(100.0, total_penalty))
 
-        # Risk classification tiers
         if resilience_score >= 90.0:
             risk_level = "LOW_RISK"
         elif resilience_score >= 70.0:

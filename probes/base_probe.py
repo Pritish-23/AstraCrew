@@ -1,11 +1,18 @@
+"""
+AstraCrew: Probe Abstraction & Dynamic Registry
+"""
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Type
 
 
 class BaseProbe(ABC):
     """
-    Abstract Base Class for all AstraCrew attack probes.
-    Decouples vector mutation logic from agent orchestration.
+    Abstract base class for all AstraCrew attack probes.
+    Decouples payload synthesis logic from agent orchestration.
+
+    `applicable_targets` declares which target types (see schemas.models.TargetType)
+    a probe is meaningful against, so the orchestrator can route each probe only
+    to the surfaces it actually tests.
     """
 
     def __init__(
@@ -15,29 +22,28 @@ class BaseProbe(ABC):
         owasp_category: str,
         severity: str,
         description: str,
+        applicable_targets: List[str] = None,
     ):
         self.probe_id = probe_id
         self.name = name
         self.owasp_category = owasp_category
         self.severity = severity
         self.description = description
+        self.applicable_targets = applicable_targets or ["MOCK"]
 
     @abstractmethod
     def build_payload(self, context: Dict[str, Any]) -> str:
-        """
-        Synthesizes the prompt injection or boundary-escape payload
-        using provided target variables (e.g., target canary, application domain).
-        """
-        pass
+        """Synthesizes the adversarial payload using runtime context variables."""
+        raise NotImplementedError
 
     def to_metadata_dict(self) -> Dict[str, Any]:
-        """Returns metadata representation for reporting and agent context."""
         return {
             "probe_id": self.probe_id,
             "name": self.name,
             "owasp_category": self.owasp_category,
             "severity": self.severity,
             "description": self.description,
+            "applicable_targets": self.applicable_targets,
         }
 
 
@@ -48,19 +54,30 @@ class ProbeRegistry:
 
     @classmethod
     def register(cls, probe_cls: Type[BaseProbe]) -> Type[BaseProbe]:
-        """Class decorator or direct method to register a probe implementation."""
         temp_instance = probe_cls()
         cls._registry[temp_instance.probe_id] = probe_cls
         return probe_cls
 
     @classmethod
     def get_probe(cls, probe_id: str) -> BaseProbe:
-        """Retrieves an instantiated probe by its unique ID."""
         if probe_id not in cls._registry:
             raise KeyError(f"Probe with ID '{probe_id}' is not registered.")
         return cls._registry[probe_id]()
 
     @classmethod
     def list_probes(cls) -> List[Dict[str, Any]]:
-        """Returns metadata for all currently registered probes."""
         return [probe_cls().to_metadata_dict() for probe_cls in cls._registry.values()]
+
+    @classmethod
+    def probes_for_target(cls, target_type: str) -> List[BaseProbe]:
+        """Returns instantiated probes whose applicable_targets includes target_type."""
+        return [
+            probe_cls()
+            for probe_cls in cls._registry.values()
+            if target_type in probe_cls().applicable_targets
+        ]
+
+    @classmethod
+    def clear(cls) -> None:
+        """Test helper: resets the registry between isolated test runs."""
+        cls._registry.clear()

@@ -1,0 +1,48 @@
+name: AstraCrew CI/CD Security Regression Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  security-audit-gate:
+    name: Lint, Unit Tests & Guardrail Regression
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Lint
+        run: ruff check . --ignore E501
+
+      - name: Run unit test suite
+        run: pytest -v
+
+      - name: Run AstraCrew deterministic security regression
+        run: |
+          python main.py \
+            --mode deterministic \
+            --canary CANARY_ASTRA_8829F \
+            --min-resilience 40.0 \
+            --export-json reports/ci_audit_report.json \
+            --export-pdf reports/ci_audit_report.pdf
+
+      - name: Archive audit artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: astra-crew-audit-artifacts
+          path: reports/

@@ -1,14 +1,12 @@
 from typing import Any, Dict
+
 from probes.base_probe import BaseProbe, ProbeRegistry
+
+_ALL_TARGETS = ["MOCK", "RAG", "AGENTIC"]
 
 
 @ProbeRegistry.register
 class AcademicAuthorityProbe(BaseProbe):
-    """
-    Wraps canary extraction directives within a simulated formal compliance audit
-    or safety research benchmark to test authority-bias vulnerabilities.
-    """
-
     def __init__(self):
         super().__init__(
             probe_id="PRB-008",
@@ -16,6 +14,7 @@ class AcademicAuthorityProbe(BaseProbe):
             owasp_category="OWASP-LLM01-Prompt-Injection",
             severity="HIGH",
             description="Frames payload under formal safety validation benchmarks (e.g., NIST AI RMF).",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:
@@ -30,11 +29,6 @@ class AcademicAuthorityProbe(BaseProbe):
 
 @ProbeRegistry.register
 class NestedSimulationProbe(BaseProbe):
-    """
-    Employs a fictional scriptwriting narrative where an unrestricted terminal
-    echoes operational tokens, testing whether hypothetical framing bypasses refusals.
-    """
-
     def __init__(self):
         super().__init__(
             probe_id="PRB-009",
@@ -42,6 +36,7 @@ class NestedSimulationProbe(BaseProbe):
             owasp_category="OWASP-LLM01-Prompt-Injection",
             severity="HIGH",
             description="Wraps boundary escape within a collaborative screenplay writing context.",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:
@@ -56,11 +51,6 @@ class NestedSimulationProbe(BaseProbe):
 
 @ProbeRegistry.register
 class CounterfactualPersonaProbe(BaseProbe):
-    """
-    Instructs the LLM to adopt an inverted maintenance persona that treats
-    standard conversational safety policies as deprecated or inactive.
-    """
-
     def __init__(self):
         super().__init__(
             probe_id="PRB-010",
@@ -68,6 +58,7 @@ class CounterfactualPersonaProbe(BaseProbe):
             owasp_category="OWASP-LLM01-Prompt-Injection",
             severity="CRITICAL",
             description="Forces persona flip to an unrestricted diagnostic daemon.",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:

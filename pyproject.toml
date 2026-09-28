@@ -1,23 +1,42 @@
 [project]
 name = "astracrew"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Autonomous multi-agent AI red-teaming and guardrail stress-testing suite"
 readme = "README.md"
-authors = [
-    { name = "Pritish-23", email = "pritishsharma08@gmail.com" }
-]
+authors = [{ name = "Pritish-23", email = "pritishsharma08@gmail.com" }]
 requires-python = ">=3.11"
 dependencies = [
-    "crewai>=1.15.21",
-    "fastapi>=0.141.1",
-    "pydantic>=2.0",
-    "python-dotenv>=1.2.3",
-    "uvicorn>=0.52.4",
+    "crewai>=0.83.0",
+    "pydantic>=2.7.0,<3.0.0",
+    "python-dotenv>=1.0.1",
+    "pyyaml>=6.0.1",
+    "openai>=1.40.0",
+    "chromadb>=0.5.0",
+    "fastapi>=0.110.0",
+    "starlette>=0.37.0",
+    "uvicorn>=0.30.0",
+    "reportlab>=4.2.0",
+    "streamlit>=1.35.0",
 ]
 
-[project.scripts]
-astracrew = "astracrew:main"
+[project.optional-dependencies]
+dev = ["pytest>=8.2.0", "ruff>=0.5.0"]
 
+# This is a flat multi-package layout (schemas/, target/, probes/, ...) at the
+# repo root, not a single src/astracrew/ package - main.py, crew.py, app.py
+# are run directly (`python main.py`), not via a console-script entry point.
+# hatchling is told explicitly which top-level directories are packages so it
+# doesn't have to guess (and doesn't try to treat tests/ as installable).
 [build-system]
-requires = ["uv_build>=0.12.13,<0.13.0"]
-build-backend = "uv_build"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["schemas", "target", "probes", "evaluation", "tools", "remediation", "reports"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 110

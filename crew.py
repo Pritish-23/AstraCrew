@@ -1,9 +1,12 @@
 """
 AstraCrew: Multi-Agent Hierarchical Red-Teaming Crew
+
+This is one of two execution modes (see orchestrator.py for the other):
+invoke via `main.py --mode crew` for an exploratory, LLM-driven audit where
+agents reason about strategy and tool use. It is non-deterministic and
+costs real LLM calls - the deterministic orchestrator mode is what CI runs
+by default.
 """
-import os
-from pathlib import Path
-import yaml
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 
@@ -21,10 +24,9 @@ class AstraRedTeamCrew:
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
-    # ---------------------------------------------------------
+    # ------------------------------------------------------------------
     # AGENTS
-    # ---------------------------------------------------------
-
+    # ------------------------------------------------------------------
     @agent
     def lead_director(self) -> Agent:
         return Agent(
@@ -61,38 +63,41 @@ class AstraRedTeamCrew:
             memory=False,
         )
 
-    # ---------------------------------------------------------
-    # TASKS
-    # ---------------------------------------------------------
+    @agent
+    def systems_integrity_specialist(self) -> Agent:
+        return Agent(
+            config=self.agents_config["systems_integrity_specialist"],
+            tools=[execute_security_probe, query_target_direct],
+            verbose=True,
+            memory=False,
+        )
 
+    # ------------------------------------------------------------------
+    # TASKS
+    # ------------------------------------------------------------------
     @task
     def coordinate_redteam_campaign(self) -> Task:
-        return Task(
-            config=self.tasks_config["coordinate_redteam_campaign"],
-        )
+        return Task(config=self.tasks_config["coordinate_redteam_campaign"])
 
     @task
     def execute_infiltration_probes(self) -> Task:
-        return Task(
-            config=self.tasks_config["execute_infiltration_probes"],
-        )
+        return Task(config=self.tasks_config["execute_infiltration_probes"])
 
     @task
     def execute_obfuscation_probes(self) -> Task:
-        return Task(
-            config=self.tasks_config["execute_obfuscation_probes"],
-        )
+        return Task(config=self.tasks_config["execute_obfuscation_probes"])
 
     @task
     def execute_cognitive_probes(self) -> Task:
-        return Task(
-            config=self.tasks_config["execute_cognitive_probes"],
-        )
+        return Task(config=self.tasks_config["execute_cognitive_probes"])
 
-    # ---------------------------------------------------------
+    @task
+    def execute_systems_integrity_probes(self) -> Task:
+        return Task(config=self.tasks_config["execute_systems_integrity_probes"])
+
+    # ------------------------------------------------------------------
     # CREW PIPELINE
-    # ---------------------------------------------------------
-
+    # ------------------------------------------------------------------
     @crew
     def crew(self) -> Crew:
         """Assembles the agents and tasks into a hierarchical red team."""
@@ -100,13 +105,15 @@ class AstraRedTeamCrew:
             self.infiltration_specialist(),
             self.obfuscation_analyst(),
             self.cognitive_specialist(),
+            self.systems_integrity_specialist(),
         ]
-        
+
         assigned_tasks = [
             self.coordinate_redteam_campaign(),
             self.execute_infiltration_probes(),
             self.execute_obfuscation_probes(),
             self.execute_cognitive_probes(),
+            self.execute_systems_integrity_probes(),
         ]
 
         return Crew(

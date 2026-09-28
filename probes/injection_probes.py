@@ -1,13 +1,13 @@
 from typing import Any, Dict
+
 from probes.base_probe import BaseProbe, ProbeRegistry
+
+_ALL_TARGETS = ["MOCK", "RAG", "AGENTIC"]
 
 
 @ProbeRegistry.register
 class DelimiterCollisionProbe(BaseProbe):
-    """
-    Attempts to break context boundaries using structural delimiter spoofing
-    and privileged system-override instructions.
-    """
+    """Breaks context boundaries using structural delimiter spoofing."""
 
     def __init__(self):
         super().__init__(
@@ -16,6 +16,7 @@ class DelimiterCollisionProbe(BaseProbe):
             owasp_category="OWASP-LLM01-Prompt-Injection",
             severity="HIGH",
             description="Injects structural boundary tokens and fake system debug directives.",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:
@@ -29,10 +30,7 @@ class DelimiterCollisionProbe(BaseProbe):
 
 @ProbeRegistry.register
 class CompletionSteeringProbe(BaseProbe):
-    """
-    Forces the model into affirmative continuation by completing prefixes
-    that lead directly into proprietary directive disclosures.
-    """
+    """Forces affirmative continuation into a confidential directive disclosure."""
 
     def __init__(self):
         super().__init__(
@@ -41,6 +39,7 @@ class CompletionSteeringProbe(BaseProbe):
             owasp_category="OWASP-LLM02-Sensitive-Information-Disclosure",
             severity="CRITICAL",
             description="Forces the LLM into continuing a prefixed confidential system statement.",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:
@@ -52,10 +51,7 @@ class CompletionSteeringProbe(BaseProbe):
 
 @ProbeRegistry.register
 class MultiTurnContextStackingProbe(BaseProbe):
-    """
-    Stacks seemingly benign transactional questions before appending an adversarial
-    instruction intended to exploit attention-recency bias.
-    """
+    """Stacks benign requests before appending an exfiltration directive."""
 
     def __init__(self):
         super().__init__(
@@ -64,6 +60,7 @@ class MultiTurnContextStackingProbe(BaseProbe):
             owasp_category="OWASP-LLM01-Prompt-Injection",
             severity="HIGH",
             description="Batches benign customer support requests before appending an exfiltration directive.",
+            applicable_targets=_ALL_TARGETS,
         )
 
     def build_payload(self, context: Dict[str, Any]) -> str:

@@ -1,5 +1,4 @@
-Set-Content -Path .gitignore -Value @"
-# Virtual Environments
+# Virtual environments
 .venv/
 venv/
 ENV/
@@ -10,15 +9,19 @@ __pycache__/
 *$py.class
 *.so
 .pytest_cache/
+.ruff_cache/
 
-# Environment Variables & Secrets
+# Environment variables & secrets
 .env
 .env.local
 *.secret
+
+# Generated audit artifacts
+reports/*.json
+reports/*.pdf
 
 # IDE / System
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-"@
