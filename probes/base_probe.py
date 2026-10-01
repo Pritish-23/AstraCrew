@@ -2,7 +2,7 @@
 AstraCrew: Probe Abstraction & Dynamic Registry
 """
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, ClassVar
 
 
 class BaseProbe(ABC):
@@ -50,7 +50,7 @@ class BaseProbe(ABC):
 class ProbeRegistry:
     """Registry managing available probe classes for dynamic discovery."""
 
-    _registry: dict[str, type[BaseProbe]] = {}
+    _registry: ClassVar[dict[str, type[BaseProbe]]] = {}
 
     @classmethod
     def register(cls, probe_cls: type[BaseProbe]) -> type[BaseProbe]:

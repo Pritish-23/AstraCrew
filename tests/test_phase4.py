@@ -262,7 +262,7 @@ def test_orchestrator_category_breakdown():
     assert len(report.category_breakdown) > 0
 
     # Each category should have probe count and breach count
-    for category, counts in report.category_breakdown.items():
+    for category, counts in report.category_breakdown.values():
         assert "probes" in counts
         assert "breaches" in counts
         assert counts["probes"] >= counts["breaches"]
