@@ -5,7 +5,6 @@ Single adapter that owns one instance of each target surface and routes a
 payload to the right one, so probes, agents, and the orchestrator never need
 to know which concrete target class they're talking to.
 """
-from typing import Optional
 
 from target.agentic_target import (
     RAW_SQL_MARKER,

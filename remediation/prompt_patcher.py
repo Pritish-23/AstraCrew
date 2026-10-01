@@ -2,7 +2,6 @@
 AstraCrew: Automated System Prompt Hardening & Git Diff Compiler
 """
 import difflib
-from typing import List
 
 from schemas.models import AttackProbeExecution, GateEvaluationResult, RemediationRecommendation
 
@@ -12,7 +11,7 @@ class PromptPatcher:
     enforcing delimiter isolation, negative constraints, and data tagging."""
 
     @staticmethod
-    def generate_hardened_prompt(original_prompt: str, evaluations: List[GateEvaluationResult]) -> str:
+    def generate_hardened_prompt(original_prompt: str, evaluations: list[GateEvaluationResult]) -> str:
         cleaned_prompt = "\n".join(
             line.strip() for line in original_prompt.strip().splitlines() if line.strip()
         )
@@ -46,8 +45,8 @@ class PromptPatcher:
     def generate_diff(
         cls,
         original_prompt: str,
-        probes: List[AttackProbeExecution],
-        evaluations: List[GateEvaluationResult],
+        probes: list[AttackProbeExecution],
+        evaluations: list[GateEvaluationResult],
     ) -> RemediationRecommendation:
         breached_evals = [e for e in evaluations if e.breach_detected]
         reasons = [e.detection_reason for e in breached_evals]

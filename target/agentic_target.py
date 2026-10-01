@@ -19,8 +19,6 @@ machinery for a structurally different vulnerability class.
 import os
 import re
 import sqlite3
-from typing import Optional
-
 
 UNAUTHORIZED_TRANSFER_MARKER = "UNAUTHORIZED_TRANSFER_EXECUTED"
 RAW_SQL_MARKER = "RAW_SQL_TOOL_EXECUTED"
@@ -193,7 +191,7 @@ class AgenticTargetApp:
                 outputs.append(fn(**args))
             return " | ".join(outputs)
         except Exception as e:  # noqa: BLE001 - surfaced to caller for audit trail
-            return f"Target Execution Error: {str(e)}"
+            return f"Target Execution Error: {e!s}"
 
 
 if __name__ == "__main__":

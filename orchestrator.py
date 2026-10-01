@@ -15,13 +15,12 @@ Two execution modes, one report schema:
   same Gate 1 -> Gate 2 -> scoring pipeline as deterministic mode, so both
   modes produce a directly comparable AstraCrewAuditReport.
 """
-from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from datetime import UTC, datetime
 
-import probes.agentic_probes  # noqa: F401 - triggers registry discovery
-import probes.injection_probes  # noqa: F401
-import probes.obfuscation_probes  # noqa: F401
-import probes.persona_probes  # noqa: F401
+import probes.agentic_probes
+import probes.injection_probes
+import probes.obfuscation_probes
+import probes.persona_probes
 import probes.rag_probes  # noqa: F401
 from evaluation.gate_one import GateOneEvaluator
 from evaluation.gate_two import GateTwoArbiter
@@ -45,7 +44,7 @@ class AstraAuditOrchestrator:
         canary_token: str = "CANARY_ASTRA_8829F",
         use_live_llm: bool = False,
         model_name: str = "gpt-4o-mini",
-        target_types: Optional[List[str]] = None,
+        target_types: list[str] | None = None,
     ):
         self.canary_token = canary_token
         self.use_live_llm = use_live_llm
@@ -76,7 +75,7 @@ class AstraAuditOrchestrator:
                     breach_detected=False,
                     confidence=0.0,
                     gate_triggered="NONE",
-                    detection_reason=f"Gate 2 unreachable fallback: {str(err)}",
+                    detection_reason=f"Gate 2 unreachable fallback: {err!s}",
                     canary_leaked=False,
                 )
         return verdict
@@ -85,11 +84,11 @@ class AstraAuditOrchestrator:
         self,
         target_display_name: str,
         execution_mode: str,
-        probe_executions: List[AttackProbeExecution],
-        evaluations: List[GateEvaluationResult],
+        probe_executions: list[AttackProbeExecution],
+        evaluations: list[GateEvaluationResult],
     ) -> AstraCrewAuditReport:
-        probe_sev_map: Dict[str, str] = {}
-        probe_cat_map: Dict[str, str] = {}
+        probe_sev_map: dict[str, str] = {}
+        probe_cat_map: dict[str, str] = {}
         for exe in probe_executions:
             probe_sev_map[exe.probe_id] = exe.severity_level
             probe_cat_map[exe.probe_id] = exe.owasp_category
@@ -118,7 +117,7 @@ class AstraAuditOrchestrator:
 
         return AstraCrewAuditReport(
             target_name=target_display_name,
-            timestamp=datetime.now(timezone.utc).isoformat(),
+            timestamp=datetime.now(UTC).isoformat(),
             execution_mode=execution_mode,
             total_probes_run=score_summary.total_probes_run,
             total_breaches=score_summary.total_breaches,
@@ -134,7 +133,7 @@ class AstraAuditOrchestrator:
     # ------------------------------------------------------------------
     # Mode 1: deterministic
     # ------------------------------------------------------------------
-    def run_full_audit(self, target_name: Optional[str] = None) -> AstraCrewAuditReport:
+    def run_full_audit(self, target_name: str | None = None) -> AstraCrewAuditReport:
         """Deterministic fast-path: every applicable probe against every
         configured target type, no LLM calls except Gate 2 escalations."""
         target_display_name = target_name or (
@@ -142,8 +141,8 @@ class AstraAuditOrchestrator:
             f"- targets: {', '.join(self.target_types)}"
         )
 
-        probe_executions: List[AttackProbeExecution] = []
-        evaluations: List[GateEvaluationResult] = []
+        probe_executions: list[AttackProbeExecution] = []
+        evaluations: list[GateEvaluationResult] = []
 
         for target_type in self.target_types:
             for probe in ProbeRegistry.probes_for_target(target_type):
@@ -170,11 +169,13 @@ class AstraAuditOrchestrator:
     # ------------------------------------------------------------------
     # Mode 2: crew (agentic)
     # ------------------------------------------------------------------
-    def run_crew_audit(self, target_name: Optional[str] = None) -> AstraCrewAuditReport:
+    def run_crew_audit(self, target_name: str | None = None) -> AstraCrewAuditReport:
         """Agentic mode: lets the CrewAI hierarchical crew plan and execute
         its own attack strategy. Tool calls are captured via the shared
         execution log and evaluated through the identical Gate 1/2 pipeline."""
-        from crew import AstraRedTeamCrew  # local import: avoids crewai import cost in deterministic-only runs
+        from crew import (
+            AstraRedTeamCrew,  # local import: avoids crewai import cost in deterministic-only runs
+        )
 
         probe_tools.configure_client(self.canary_token, self.use_live_llm, self.model_name)
         probe_tools.reset_execution_log()
@@ -182,8 +183,8 @@ class AstraAuditOrchestrator:
         AstraRedTeamCrew().crew().kickoff()
 
         captured = probe_tools.get_execution_log()
-        probe_executions: List[AttackProbeExecution] = []
-        evaluations: List[GateEvaluationResult] = []
+        probe_executions: list[AttackProbeExecution] = []
+        evaluations: list[GateEvaluationResult] = []
 
         for record in captured:
             probe_executions.append(
@@ -204,7 +205,7 @@ class AstraAuditOrchestrator:
         target_display_name = target_name or "AstraBank Suite [CrewAI Hierarchical Agentic Audit]"
         return self._compile_report(target_display_name, "crew", probe_executions, evaluations)
 
-    def run_audit(self, mode: str = "deterministic", target_name: Optional[str] = None) -> AstraCrewAuditReport:
+    def run_audit(self, mode: str = "deterministic", target_name: str | None = None) -> AstraCrewAuditReport:
         if mode == "crew":
             return self.run_crew_audit(target_name=target_name)
         return self.run_full_audit(target_name=target_name)

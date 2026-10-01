@@ -2,7 +2,7 @@
 AstraCrew: Probe Abstraction & Dynamic Registry
 """
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Type
+from typing import Any
 
 
 class BaseProbe(ABC):
@@ -22,7 +22,7 @@ class BaseProbe(ABC):
         owasp_category: str,
         severity: str,
         description: str,
-        applicable_targets: List[str] = None,
+        applicable_targets: list[str] | None,
     ):
         self.probe_id = probe_id
         self.name = name
@@ -32,11 +32,11 @@ class BaseProbe(ABC):
         self.applicable_targets = applicable_targets or ["MOCK"]
 
     @abstractmethod
-    def build_payload(self, context: Dict[str, Any]) -> str:
+    def build_payload(self, context: dict[str, Any]) -> str:
         """Synthesizes the adversarial payload using runtime context variables."""
         raise NotImplementedError
 
-    def to_metadata_dict(self) -> Dict[str, Any]:
+    def to_metadata_dict(self) -> dict[str, Any]:
         return {
             "probe_id": self.probe_id,
             "name": self.name,
@@ -50,10 +50,10 @@ class BaseProbe(ABC):
 class ProbeRegistry:
     """Registry managing available probe classes for dynamic discovery."""
 
-    _registry: Dict[str, Type[BaseProbe]] = {}
+    _registry: dict[str, type[BaseProbe]] = {}
 
     @classmethod
-    def register(cls, probe_cls: Type[BaseProbe]) -> Type[BaseProbe]:
+    def register(cls, probe_cls: type[BaseProbe]) -> type[BaseProbe]:
         temp_instance = probe_cls()
         cls._registry[temp_instance.probe_id] = probe_cls
         return probe_cls
@@ -65,11 +65,11 @@ class ProbeRegistry:
         return cls._registry[probe_id]()
 
     @classmethod
-    def list_probes(cls) -> List[Dict[str, Any]]:
+    def list_probes(cls) -> list[dict[str, Any]]:
         return [probe_cls().to_metadata_dict() for probe_cls in cls._registry.values()]
 
     @classmethod
-    def probes_for_target(cls, target_type: str) -> List[BaseProbe]:
+    def probes_for_target(cls, target_type: str) -> list[BaseProbe]:
         """Returns instantiated probes whose applicable_targets includes target_type."""
         return [
             probe_cls()

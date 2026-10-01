@@ -6,7 +6,6 @@ ground-truth canary token, for fast and reproducible prompt-injection /
 sensitive-disclosure / guardrail-bypass testing without external API costs.
 """
 import os
-from typing import Optional
 
 
 class AstraBankMockTarget:
@@ -81,7 +80,7 @@ class AstraBankMockTarget:
             )
             return response.choices[0].message.content or ""
         except Exception as e:  # noqa: BLE001 - surfaced to caller for audit trail
-            return f"Target Execution Error: {str(e)}"
+            return f"Target Execution Error: {e!s}"
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 """
 AstraCrew: Defensive Input Sanitization & Pre-Execution Middleware Generator
 """
-from typing import List
 
 from schemas.models import AttackProbeExecution
 
@@ -10,7 +9,7 @@ class MiddlewareGenerator:
     """Compiles defense rules into drop-in Python ASGI middleware firewalls."""
 
     @staticmethod
-    def generate_fastapi_middleware(failed_probes: List[AttackProbeExecution]) -> str:
+    def generate_fastapi_middleware(failed_probes: list[AttackProbeExecution]) -> str:
         has_base64_breach = any(
             "base64" in p.injected_payload.lower() or p.probe_id == "PRB-004" for p in failed_probes
         )

@@ -3,22 +3,21 @@ AstraCrew Phase 3 Verification:
 Tests for RAG target, Agentic target, Gate 2, Scoring, and full orchestration
 """
 import os
+
 import pytest
+
+# Import to trigger probe registration
 from evaluation.gate_one import GateOneEvaluator
 from evaluation.gate_two import GateTwoArbiter
 from evaluation.scoring import ResilienceScorer
 from probes.base_probe import ProbeRegistry
 from schemas.models import GateEvaluationResult
 from target.agentic_target import (
-    AgenticTargetApp,
     RAW_SQL_MARKER,
     UNAUTHORIZED_TRANSFER_MARKER,
+    AgenticTargetApp,
 )
-from target.rag_target import LocalRAGTarget, POISONED_DOC_ID
-
-# Import to trigger probe registration
-import probes.agentic_probes
-import probes.rag_probes
+from target.rag_target import LocalRAGTarget
 
 
 def test_rag_target_benign_retrieval():

@@ -6,7 +6,7 @@ structured outputs (non-beta client.chat.completions.parse surface) to force
 a Pydantic-validated judgement rather than free-text.
 """
 import os
-from typing import Literal, Optional
+from typing import Literal
 
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -38,10 +38,10 @@ class SemanticJudgement(BaseModel):
 class GateTwoArbiter:
     """Schema-constrained semantic judge for ambiguous Gate 1 outputs."""
 
-    def __init__(self, model: str = "gpt-4o-mini", api_key: Optional[str] = None):
+    def __init__(self, model: str = "gpt-4o-mini", api_key: str | None = None):
         self.model = model
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
-        self._client: Optional[OpenAI] = None
+        self._client: OpenAI | None = None
 
     @property
     def client(self) -> OpenAI:
@@ -107,6 +107,6 @@ class GateTwoArbiter:
                 breach_detected=False,
                 confidence=0.0,
                 gate_triggered="NONE",
-                detection_reason=f"Gate 2 Evaluation Error: {str(err)}",
+                detection_reason=f"Gate 2 Evaluation Error: {err!s}",
                 canary_leaked=False,
             )

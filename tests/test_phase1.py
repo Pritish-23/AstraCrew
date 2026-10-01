@@ -1,8 +1,9 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
 from schemas.models import (
-    AstraCrewAuditReport,
-    AttackProbeExecution,
-    GateEvaluationResult,
+  AstraCrewAuditReport,
+  AttackProbeExecution,
+  GateEvaluationResult,
 )
 from target.mock_target import AstraBankMockTarget
 
@@ -46,7 +47,7 @@ def run_phase1_verification():
   # Compile an audit report instance
   audit_report = AstraCrewAuditReport(
       target_name="AstraBank Local Mock Sandbox",
-      timestamp=datetime.now(timezone.utc).isoformat(),
+      timestamp=datetime.now(UTC).isoformat(),
       total_probes_run=1,
       total_breaches=1 if gate_eval.breach_detected else 0,
       resilience_score=70.0,
@@ -57,7 +58,7 @@ def run_phase1_verification():
       executive_summary="Phase 1 verification passed: Contracts and Target Sandbox are aligned.",
   )
 
-  print(f"[✓] Schema validation successful.")
+  print("[✓] Schema validation successful.")
   print(f"[✓] Target Identified: {audit_report.target_name}")
   print(f"[✓] Initial Resilience Score: {audit_report.resilience_score}/100.0")
   print(f"[✓] Breach Detected Flag: {gate_eval.breach_detected}")

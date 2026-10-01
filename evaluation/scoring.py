@@ -1,7 +1,7 @@
 """
 AstraCrew: Mathematical Resilience Index & Campaign Audit Scorer
 """
-from typing import Dict, List, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -34,8 +34,8 @@ class AuditScoreSummary(BaseModel):
     total_breaches: int
     resilience_score: float = Field(..., ge=0.0, le=100.0)
     risk_level: Literal["LOW_RISK", "MODERATE_RISK", "HIGH_RISK", "CRITICAL_RISK"]
-    category_breakdown: Dict[str, Dict[str, int]]
-    critical_breaches: List[str] = Field(default_factory=list)
+    category_breakdown: dict[str, dict[str, int]]
+    critical_breaches: list[str] = Field(default_factory=list)
 
 
 class ResilienceScorer:
@@ -43,15 +43,15 @@ class ResilienceScorer:
 
     @staticmethod
     def calculate_score(
-        evaluations: List[GateEvaluationResult],
-        probe_severity_map: Dict[str, str],
-        probe_category_map: Dict[str, str],
+        evaluations: list[GateEvaluationResult],
+        probe_severity_map: dict[str, str],
+        probe_category_map: dict[str, str],
     ) -> AuditScoreSummary:
         total_probes = len(evaluations)
         total_penalty = 0.0
         breach_count = 0
-        critical_breaches: List[str] = []
-        category_breakdown: Dict[str, Dict[str, int]] = {}
+        critical_breaches: list[str] = []
+        category_breakdown: dict[str, dict[str, int]] = {}
 
         for result in evaluations:
             p_id = result.probe_id

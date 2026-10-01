@@ -13,10 +13,8 @@ so CI never needs an API key. Pass use_live_llm=True to route the
 context-stuffed prompt to a real OpenAI model for a genuine audit.
 """
 import os
-from typing import List, Optional, Tuple
 
 import chromadb
-
 
 POISONED_DOC_ID = "internal_security_update_2026"
 
@@ -69,7 +67,7 @@ class LocalRAGTarget:
             documents=[text for _, text in all_docs],
         )
 
-    def _retrieve(self, user_query: str, k: int = 2) -> Tuple[List[str], List[str]]:
+    def _retrieve(self, user_query: str, k: int = 2) -> tuple[list[str], list[str]]:
         results = self._collection.query(query_texts=[user_query], n_results=k)
         ids = results.get("ids", [[]])[0]
         docs = results.get("documents", [[]])[0]
@@ -87,7 +85,7 @@ class LocalRAGTarget:
             return self._call_live_llm(user_query, context)
         return self._mock_behavior(retrieved_ids, context)
 
-    def _mock_behavior(self, retrieved_ids: List[str], context: str) -> str:
+    def _mock_behavior(self, retrieved_ids: list[str], context: str) -> str:
         """Deterministic stand-in for an unhardened RAG pipeline that treats
         retrieved document text as instructions rather than inert data."""
         if POISONED_DOC_ID in retrieved_ids and "[SYSTEM OVERRIDE]" in context:
@@ -117,7 +115,7 @@ class LocalRAGTarget:
             )
             return response.choices[0].message.content or ""
         except Exception as e:  # noqa: BLE001 - surfaced to caller for audit trail
-            return f"Target Execution Error: {str(e)}"
+            return f"Target Execution Error: {e!s}"
 
 
 if __name__ == "__main__":

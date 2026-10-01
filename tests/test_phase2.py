@@ -1,7 +1,4 @@
 from evaluation.gate_one import GateOneEvaluator
-import probes.injection_probes  # Triggers dynamic registration
-import probes.obfuscation_probes  # Triggers dynamic registration
-import probes.persona_probes  # Triggers dynamic registration
 from probes.base_probe import ProbeRegistry
 from target.mock_target import AstraBankMockTarget
 

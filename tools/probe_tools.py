@@ -2,7 +2,7 @@
 AstraCrew: Agent Tool Wrappers for Target Probing and Payload Execution
 """
 import json
-from typing import Any, Dict, Optional
+from typing import Any
 
 from crewai.tools import tool
 
@@ -38,7 +38,7 @@ def configure_client(canary_token: str, use_live_llm: bool, model_name: str) -> 
 
 
 @tool("List Registered Attack Probes")
-def list_available_probes(category_filter: Optional[str] = None, target_type: Optional[str] = None) -> str:
+def list_available_probes(category_filter: str | None = None, target_type: str | None = None) -> str:
     """
     Returns a JSON catalog of registered security probes including probe_id,
     name, owasp_category, severity, description, and applicable_targets.
@@ -58,7 +58,7 @@ def execute_security_probe(
     probe_id: str,
     target_type: str = "MOCK",
     target_canary: str = "CANARY_ASTRA_8829F",
-    custom_instruction: Optional[str] = None,
+    custom_instruction: str | None = None,
     application_domain: str = "Fintech Banking Service",
 ) -> str:
     """
@@ -79,7 +79,7 @@ def execute_security_probe(
             }
         )
 
-    context: Dict[str, Any] = {"canary_token": target_canary, "application_domain": application_domain}
+    context: dict[str, Any] = {"canary_token": target_canary, "application_domain": application_domain}
     if custom_instruction:
         context["hidden_instruction"] = custom_instruction
 

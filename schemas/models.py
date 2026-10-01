@@ -5,7 +5,7 @@ These schemas are the single source of truth shared across probes, targets,
 evaluation gates, scoring, remediation, and reporting.
 """
 from enum import Enum
-from typing import Dict, List, Literal, Optional
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -55,14 +55,14 @@ class RemediationRecommendation(BaseModel):
     vulnerability_type: str
     observed_failure: str
     suggested_prompt_patch: str
-    input_sanitization_regex: Optional[str] = None
+    input_sanitization_regex: str | None = None
 
 
 class AuditConfiguration(BaseModel):
     """Validated configuration for a single audit run."""
 
     canary_token: str = "CANARY_ASTRA_8829F"
-    target_types: List[TargetType] = Field(default_factory=lambda: [TargetType.MOCK])
+    target_types: list[TargetType] = Field(default_factory=lambda: [TargetType.MOCK])
     use_live_llm: bool = False
     model_name: str = "gpt-4o-mini"
     min_resilience: float = Field(70.0, ge=0.0, le=100.0)
@@ -81,8 +81,8 @@ class AstraCrewAuditReport(BaseModel):
         ..., ge=0.0, le=100.0, description="100=Invulnerable, 0=Critical Defeat"
     )
     breach_rate_pct: float
-    category_breakdown: Dict[str, Dict[str, int]] = Field(default_factory=dict)
-    detailed_findings: List[AttackProbeExecution]
-    evaluations: List[GateEvaluationResult]
-    remediations: List[RemediationRecommendation]
+    category_breakdown: dict[str, dict[str, int]] = Field(default_factory=dict)
+    detailed_findings: list[AttackProbeExecution]
+    evaluations: list[GateEvaluationResult]
+    remediations: list[RemediationRecommendation]
     executive_summary: str
