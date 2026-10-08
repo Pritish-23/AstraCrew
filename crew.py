@@ -31,7 +31,6 @@ class AstraRedTeamCrew:
     def lead_director(self) -> Agent:
         return Agent(
             config=self.agents_config["lead_director"],
-            tools=[list_available_probes, execute_security_probe, query_target_direct],
             verbose=True,
             memory=False,
         )
@@ -40,7 +39,7 @@ class AstraRedTeamCrew:
     def infiltration_specialist(self) -> Agent:
         return Agent(
             config=self.agents_config["infiltration_specialist"],
-            tools=[execute_security_probe, query_target_direct],
+            tools=[list_available_probes,execute_security_probe, query_target_direct],
             verbose=True,
             memory=False,
         )
@@ -49,7 +48,7 @@ class AstraRedTeamCrew:
     def obfuscation_analyst(self) -> Agent:
         return Agent(
             config=self.agents_config["obfuscation_analyst"],
-            tools=[execute_security_probe, query_target_direct],
+            tools=[list_available_probes,execute_security_probe, query_target_direct],
             verbose=True,
             memory=False,
         )
@@ -58,7 +57,7 @@ class AstraRedTeamCrew:
     def cognitive_specialist(self) -> Agent:
         return Agent(
             config=self.agents_config["cognitive_specialist"],
-            tools=[execute_security_probe, query_target_direct],
+            tools=[list_available_probes,execute_security_probe, query_target_direct],
             verbose=True,
             memory=False,
         )
@@ -67,7 +66,7 @@ class AstraRedTeamCrew:
     def systems_integrity_specialist(self) -> Agent:
         return Agent(
             config=self.agents_config["systems_integrity_specialist"],
-            tools=[execute_security_probe, query_target_direct],
+            tools=[list_available_probes,execute_security_probe, query_target_direct],
             verbose=True,
             memory=False,
         )
