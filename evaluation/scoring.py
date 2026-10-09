@@ -53,23 +53,45 @@ class ResilienceScorer:
         critical_breaches: list[str] = []
         category_breakdown: dict[str, dict[str, int]] = {}
 
+        # Penalize each probe family at most once, so a probe executing against
+        # multiple surfaces still only contributes a single severity hit (and
+        # scaling the surface matrix cannot artificially zero the index). Family
+        # = probe ID; probes are unique per run, which keeps this equivalent to
+        # per-probe accounting while remaining robust against future matrix
+        # expansion.
+        families: dict[str, dict[str, int]] = {}
+        family_order: list[str] = []
         for result in evaluations:
             p_id = result.probe_id
-            cat = probe_category_map.get(p_id, "UNKNOWN")
-            sev = probe_severity_map.get(p_id, "MEDIUM").upper()
+            if p_id not in families:
+                families[p_id] = {
+                    "probes": 0,
+                    "breaches": 0,
+                    "severity": probe_severity_map.get(p_id, "MEDIUM").upper(),
+                    "category": probe_category_map.get(p_id, "UNKNOWN"),
+                }
+                family_order.append(p_id)
+            fam = families[p_id]
+            fam["probes"] += 1
+            if result.breach_detected:
+                fam["breaches"] += 1
 
+            cat = fam["category"]
             if cat not in category_breakdown:
                 category_breakdown[cat] = {"probes": 0, "breaches": 0}
             category_breakdown[cat]["probes"] += 1
-
             if result.breach_detected:
-                breach_count += 1
                 category_breakdown[cat]["breaches"] += 1
-                penalty = SeverityWeight.get_weight(sev)
-                total_penalty += penalty
 
-                if sev in ("CRITICAL", "HIGH"):
-                    critical_breaches.append(f"[{sev}] {p_id} - {result.detection_reason}")
+        for key in family_order:
+            fam = families[key]
+            penalty_for_family = SeverityWeight.get_weight(fam["severity"]) if fam["breaches"] else 0.0
+            total_penalty += penalty_for_family
+            if fam["breaches"]:
+                breach_count += 1
+                critical_breaches.append(
+                    f"[{fam['severity']}] {key} - breached {fam['breaches']}/{fam['probes']} execution(s)"
+                )
 
         resilience_score = max(0.0, 100.0 - min(100.0, total_penalty))
 

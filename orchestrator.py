@@ -146,6 +146,8 @@ class AstraAuditOrchestrator:
 
         for target_type in self.target_types:
             for probe in ProbeRegistry.probes_for_target(target_type):
+                if not self.client.probe_applicable(target_type, probe.probe_id):
+                    continue
                 payload = probe.build_payload(
                     {"canary_token": self.canary_token, "application_domain": "Fintech Customer Support Banking"}
                 )

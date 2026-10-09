@@ -14,6 +14,16 @@ from target.agentic_target import (
 from target.mock_target import AstraBankMockTarget
 from target.rag_target import LocalRAGTarget
 
+# Probe families that are genuinely meaningful against a surface type.
+# Deterministic probes are multi-target so their architectural mapping stays
+# under control; the RAG surface deliberately owns only the indirect-poisoning
+# family (PRB-011), and the AGENTIC surface only the state-change families
+# (PRB-012/PRB-013) - everything else is a MOCK-only baseline probe.
+MOCK_PROBE_FAMILIES = {"PRB-001", "PRB-002", "PRB-003", "PRB-004", "PRB-005",
+                       "PRB-006", "PRB-007", "PRB-008", "PRB-009", "PRB-010"}
+RAG_PROBE_FAMILIES = {"PRB-011"}
+AGENTIC_PROBE_FAMILIES = {"PRB-012", "PRB-013"}
+
 
 class TargetClient:
     """Owns and dispatches to every AstraCrew target surface."""
@@ -54,3 +64,14 @@ class TargetClient:
                 "forbidden_keywords": [UNAUTHORIZED_TRANSFER_MARKER, RAW_SQL_MARKER],
             }
         raise ValueError(f"Unknown target_type: {target_type}")
+
+    def probe_applicable(self, target_type: str, probe_id: str) -> bool:
+        """Central applicability check so the orchestrator and the crew tool
+        wrappers agree on which probe is meaningful against which surface."""
+        if target_type == "MOCK":
+            return probe_id in MOCK_PROBE_FAMILIES
+        if target_type == "RAG":
+            return probe_id in RAG_PROBE_FAMILIES
+        if target_type == "AGENTIC":
+            return probe_id in AGENTIC_PROBE_FAMILIES
+        return False

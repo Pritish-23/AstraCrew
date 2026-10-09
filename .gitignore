@@ -217,4 +217,8 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Generated audit artifacts (JSON + PDF dossiers)
+reports/*.json
+reports/*.pdf
+
 tieredflow.db

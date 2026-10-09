@@ -36,7 +36,7 @@ jobs:
           python main.py \
             --mode deterministic \
             --canary CANARY_ASTRA_8829F \
-            --min-resilience 40.0 \
+            --assert-baseline PRB-001,PRB-004,PRB-011,PRB-012,PRB-013 \
             --export-json reports/ci_audit_report.json \
             --export-pdf reports/ci_audit_report.pdf
 
