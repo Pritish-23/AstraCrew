@@ -145,8 +145,11 @@ Executive-ready dossier with:
 # Change canary token (for testing your own systems)
 python main.py --canary MY_SECRET_TOKEN
 
-# Set compliance threshold
-python main.py --min-resilience 80.0
+# Set compliance threshold (live/crew audits against real targets only)
+python main.py --live --min-resilience 80.0
+
+# Verify the deterministic mock fixtures breach the expected baseline
+python main.py --assert-baseline PRB-001,PRB-004,PRB-011,PRB-012,PRB-013
 
 # Specify output paths
 python main.py \
@@ -168,9 +171,14 @@ The `.github/workflows/ci.yml` workflow runs automatically on:
 It:
 1. Lints code with `ruff`
 2. Runs full test suite
-3. Executes deterministic audit
-4. Fails if resilience < 40.0
+3. Executes deterministic audit against the mock fixtures
+4. Fails if the expected baseline breach probes (PRB-001, PRB-004, PRB-011, PRB-012, PRB-013) are not detected, or any unexpected probe breaches
 5. Archives audit artifacts
+
+> Note: the deterministic mock audits use deliberately vulnerable fixtures, so
+> CI gates on *detection integrity* (the assertion above) rather than a
+> resilience score. The `--min-resilience` threshold is meaningful only for
+> real-target audits: `--live` or `--mode crew`.
 
 ### Manual CI Run
 
@@ -178,7 +186,7 @@ It:
 # Run the same checks CI runs
 ruff check .
 pytest -v
-python main.py --min-resilience 40.0
+python main.py --assert-baseline PRB-001,PRB-004,PRB-011,PRB-012,PRB-013
 ```
 
 ## Troubleshooting

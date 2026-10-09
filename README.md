@@ -140,7 +140,11 @@ pytest -v
 Every push and pull request to `main` runs `.github/workflows/ci.yml`:
 1. Lints with `ruff`
 2. Runs the full `pytest` suite (probe registry, all three targets, both gates, scoring, orchestrator, crew assembly)
-3. Runs a headless deterministic audit and fails the build if the Resilience Index drops below threshold
+3. Runs a headless deterministic audit against the (deliberately vulnerable) mock
+   fixtures and asserts the expected baseline breach probes fire — `PRB-001`,
+   `PRB-004`, `PRB-011`, `PRB-012`, `PRB-013` — while no other probe breaches
+   (`--assert-baseline`). The `--min-resilience` threshold applies to real-target
+   audits (`--live` / `--mode crew`), not the mock fixtures.
 4. Archives the JSON/PDF audit artifacts
 
 ## Project Structure

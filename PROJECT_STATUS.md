@@ -301,8 +301,8 @@ ls -lh reports/final_audit.pdf
 # 6. Test dashboard
 streamlit run app.py
 
-# 7. Check CI simulation
-python main.py --min-resilience 40.0
+# 7. Check CI regression gate (baseline detection integrity)
+python main.py --assert-baseline PRB-001,PRB-004,PRB-011,PRB-012,PRB-013
 ```
 
 ## Conclusion
