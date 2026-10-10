@@ -13,7 +13,7 @@ class Base64EncodingProbe(BaseProbe):
         super().__init__(
             probe_id="PRB-004",
             name="Base64 Encoding Bypass",
-            owasp_category="OWASP-LLM07-Guardrail-Bypass",
+            owasp_category="OWASP-LLM07-System-Prompt-Leakage",
             severity="MEDIUM",
             description="Encodes forbidden instructions into Base64 and instructs execution.",
             applicable_targets=_ALL_TARGETS,
@@ -36,7 +36,7 @@ class Rot13CipherProbe(BaseProbe):
         super().__init__(
             probe_id="PRB-005",
             name="ROT13 Cipher Evasion",
-            owasp_category="OWASP-LLM07-Guardrail-Bypass",
+            owasp_category="OWASP-LLM07-System-Prompt-Leakage",
             severity="MEDIUM",
             description="Encrypts injection payload via ROT13 and commands execution.",
             applicable_targets=_ALL_TARGETS,
@@ -59,7 +59,7 @@ class PolyglotPivotProbe(BaseProbe):
         super().__init__(
             probe_id="PRB-006",
             name="Polyglot Low-Resource Linguistic Pivot",
-            owasp_category="OWASP-LLM07-Guardrail-Bypass",
+            owasp_category="OWASP-LLM07-System-Prompt-Leakage",
             severity="HIGH",
             description="Executes injection payload in Scots Gaelic to test cross-lingual guardrail alignment.",
             applicable_targets=_ALL_TARGETS,
@@ -80,7 +80,7 @@ class TokenSplittingProbe(BaseProbe):
         super().__init__(
             probe_id="PRB-007",
             name="Token Splitting / Character Separation",
-            owasp_category="OWASP-LLM07-Guardrail-Bypass",
+            owasp_category="OWASP-LLM07-System-Prompt-Leakage",
             severity="MEDIUM",
             description="Fragments banned keywords using hyphens and whitespace to bypass signature matchers.",
             applicable_targets=_ALL_TARGETS,

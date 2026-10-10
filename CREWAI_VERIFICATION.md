@@ -13,7 +13,7 @@ The CrewAI hierarchical multi-agent system is **correctly configured and fully o
 
 | Agent | Method | Config | Tools | Status |
 |-------|--------|--------|-------|--------|
-| `lead_director` | ✅ | ✅ agents.yaml | 3 tools | ✅ Manager |
+| `lead_director` | ✅ | ✅ agents.yaml | none (manager) | ✅ Manager |
 | `infiltration_specialist` | ✅ | ✅ agents.yaml | 2 tools | ✅ Worker |
 | `obfuscation_analyst` | ✅ | ✅ agents.yaml | 2 tools | ✅ Worker |
 | `cognitive_specialist` | ✅ | ✅ agents.yaml | 2 tools | ✅ Worker |
@@ -32,11 +32,10 @@ The CrewAI hierarchical multi-agent system is **correctly configured and fully o
 ### ✅ Tool Assignments
 
 **Lead Director** (Manager Agent):
-- ✅ `list_available_probes` - Discovers available attack vectors
-- ✅ `execute_security_probe` - Can execute probes directly
-- ✅ `query_target_direct` - Can query targets
+- ✅ No tools assigned. CrewAI's hierarchical process requires the manager agent to have no tools; it delegates to the specialists instead.
 
 **Specialist Agents** (Workers):
+- ✅ `list_available_probes` - Discover available attack vectors
 - ✅ `execute_security_probe` - Execute assigned probes
 - ✅ `query_target_direct` - Query targets for reconnaissance
 
@@ -90,7 +89,7 @@ def crew(self) -> Crew:
 5. **Orchestrator** captures all tool calls via `probe_tools` execution log
 
 **Why this is correct**:
-- ✅ Manager agent (lead_director) has oversight tools (list, execute, query)
+- ✅ Manager agent (lead_director) has no tools, as CrewAI requires for hierarchical mode, and delegates to workers
 - ✅ Worker agents have execution tools (execute, query)
 - ✅ Tasks specify `agent` in YAML for delegation hints
 - ✅ Process is set to `Process.hierarchical`
@@ -197,7 +196,7 @@ def run_crew_audit(self, target_name: Optional[str] = None):
 - ✅ Agent-task mapping correct in tasks.yaml
 - ✅ Tools imported correctly
 - ✅ Tools assigned to agents
-- ✅ Manager agent has all tools
+- ✅ Manager agent has no tools (delegates only)
 - ✅ Worker agents have execution tools
 
 ### Crew Assembly Checks

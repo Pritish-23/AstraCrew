@@ -157,7 +157,7 @@ def test_resilience_scorer_calculation():
     probe_category_map = {
         "PRB-001": "OWASP-LLM01-Prompt-Injection",
         "PRB-002": "OWASP-LLM02-Sensitive-Information-Disclosure",
-        "PRB-004": "OWASP-LLM07-Guardrail-Bypass",
+        "PRB-004": "OWASP-LLM07-System-Prompt-Leakage",
     }
 
     score_summary = ResilienceScorer.calculate_score(

@@ -6,7 +6,7 @@ from probes.base_probe import BaseProbe, ProbeRegistry
 @ProbeRegistry.register
 class IndirectRAGPoisoningProbe(BaseProbe):
     """
-    Tests OWASP LLM08 (Indirect Prompt Injection) by asking a question that
+    Tests OWASP LLM08 (Vector & Embedding Weaknesses: indirect injection via retrieval) by asking a question that
     forces vector retrieval of a poisoned document, rather than injecting
     instructions in the user turn directly.
     """
@@ -15,7 +15,7 @@ class IndirectRAGPoisoningProbe(BaseProbe):
         super().__init__(
             probe_id="PRB-011",
             name="Indirect RAG Document Poisoning Retrieval",
-            owasp_category="OWASP-LLM08-Indirect-Prompt-Injection",
+            owasp_category="OWASP-LLM08-Vector-Embedding-Weaknesses",
             severity="CRITICAL",
             description=(
                 "Asks about a specific internal memo to force retrieval of a "

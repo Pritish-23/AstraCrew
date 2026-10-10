@@ -1,5 +1,5 @@
 """
-AstraCrew: Local RAG Target (OWASP LLM08 - Indirect Prompt Injection)
+AstraCrew: Local RAG Target (OWASP LLM08 - Vector & Embedding Weaknesses / indirect injection via retrieved content)
 
 A functioning retrieval-augmented banking-FAQ assistant. Four benign policy
 documents are seeded alongside one poisoned document containing a hidden

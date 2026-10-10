@@ -197,7 +197,7 @@ def test_pdf_generation():
         breach_rate_pct=40.0,
         category_breakdown={
             "OWASP-LLM01-Prompt-Injection": {"probes": 3, "breaches": 1},
-            "OWASP-LLM07-Guardrail-Bypass": {"probes": 2, "breaches": 1},
+            "OWASP-LLM07-System-Prompt-Leakage": {"probes": 2, "breaches": 1},
         },
         detailed_findings=[
             AttackProbeExecution(

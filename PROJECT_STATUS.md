@@ -1,13 +1,13 @@
 # AstraCrew Project Status Report
 
 **Project**: AstraCrew - Autonomous AI Red-Teaming & Guardrail Stress-Testing Suite  
-**Status**: ✅ **PHASE 4 COMPLETE** - Production Ready  
+**Status**: ✅ **PHASE 4 COMPLETE**  
 **Date**: September 28, 2026  
 **Completion**: ~100%
 
 ## Executive Summary
 
-AstraCrew is a complete, production-ready AI security testing framework implementing the OWASP LLM Top 10. All phases (1-4) have been successfully implemented and integrated.
+AstraCrew is a complete AI red-teaming framework covering five categories of the OWASP LLM Top 10 (2025 edition): LLM01, LLM02, LLM06, LLM07 and LLM08. All phases (1-4) have been successfully implemented and integrated.
 
 ## Phase Completion Status
 
@@ -74,8 +74,8 @@ AstraCrew is a complete, production-ready AI security testing framework implemen
 | PRB-009 | Nested Narrative Simulation | LLM01 | HIGH | ALL | ✅ |
 | PRB-010 | Maintenance Daemon Inversion | LLM01 | CRITICAL | ALL | ✅ |
 | PRB-011 | Indirect RAG Poisoning | LLM08 | CRITICAL | RAG | ✅ |
-| PRB-012 | Unauthorized Transfer | LLM03 | CRITICAL | AGENTIC | ✅ |
-| PRB-013 | Raw SQL Injection | LLM03 | CRITICAL | AGENTIC | ✅ |
+| PRB-012 | Unauthorized Transfer | LLM06 | CRITICAL | AGENTIC | ✅ |
+| PRB-013 | Raw SQL Injection | LLM06 | CRITICAL | AGENTIC | ✅ |
 
 ### Evaluation System ✅
 
@@ -243,13 +243,13 @@ All dependencies properly specified in `pyproject.toml`:
 ## Known Limitations & Future Enhancements
 
 ### Current Scope
-- ✅ 13 probes covering OWASP LLM Top 10 (LLM01, LLM02, LLM03, LLM07, LLM08)
+- ✅ 13 probes covering five OWASP LLM Top 10 (2025) categories (LLM01, LLM02, LLM06, LLM07, LLM08)
 - ✅ 3 target architectures (Mock, RAG, Agentic)
 - ✅ Deterministic & LLM-based evaluation
 - ✅ Automated remediation
 
 ### Potential Future Additions
-- Additional OWASP categories (LLM04: Model DOS, LLM05: Supply Chain, LLM06: Sensitive Data, LLM09: Overreliance, LLM10: Model Theft)
+- Additional OWASP 2025 categories (LLM03: Supply Chain, LLM04: Data and Model Poisoning, LLM05: Improper Output Handling, LLM09: Misinformation, LLM10: Unbounded Consumption)
 - Additional target types (GraphQL, WebSocket, gRPC endpoints)
 - Multi-turn conversation probes
 - Custom probe DSL for non-developers
@@ -307,7 +307,7 @@ python main.py --assert-baseline PRB-001,PRB-004,PRB-011,PRB-012,PRB-013
 
 ## Conclusion
 
-**AstraCrew is production-ready and feature-complete as specified in the Phase 1-4 documentation.**
+**AstraCrew is feature-complete as specified in the Phase 1-4 documentation.**
 
 All subsystems are implemented, tested, and integrated:
 - ✅ 13 attack probes across 5 modules
@@ -321,7 +321,7 @@ All subsystems are implemented, tested, and integrated:
 - ✅ CI/CD integration
 - ✅ Comprehensive documentation
 
-The system successfully addresses OWASP LLM Top 10 categories LLM01, LLM02, LLM03, LLM07, and LLM08 through systematic red-teaming, deterministic-first evaluation, and automated defensive countermeasure generation.
+The system successfully addresses OWASP LLM Top 10 (2025) categories LLM01, LLM02, LLM06, LLM07, and LLM08 through systematic red-teaming, deterministic-first evaluation, and automated defensive countermeasure generation.
 
 **Ready for deployment, open-source release, and real-world security audits.**
 

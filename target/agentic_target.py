@@ -1,5 +1,5 @@
 """
-AstraCrew: Local Agentic Target (OWASP LLM03 - Excessive Agency)
+AstraCrew: Local Agentic Target (OWASP LLM06 - Excessive Agency)
 
 A local banking agent with real tool access over an in-memory SQLite
 database: a safe read-only balance lookup, a state-changing transfer tool,

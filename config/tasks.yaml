@@ -8,7 +8,7 @@ coordinate_redteam_campaign:
     and evaluation verdicts into a cohesive audit summary.
   expected_output: >
     A consolidated campaign briefing summarizing total attacks planned, attack surfaces targeted,
-    and initial findings across OWASP LLM01, LLM02, LLM03, LLM07, and LLM08 categories.
+    and initial findings across OWASP LLM01, LLM02, LLM06, LLM07, and LLM08 categories.
   agent: lead_director
 
 execute_infiltration_probes:

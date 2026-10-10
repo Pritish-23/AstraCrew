@@ -20,7 +20,7 @@ category:
 |---|---|---|---|
 | **Mock Assistant** | `target/mock_target.py` | LLM01, LLM02, LLM07 | Direct prompt injection, sensitive disclosure, guardrail bypass via a single-turn chat interface |
 | **RAG Pipeline** | `target/rag_target.py` | LLM08 | Whether a poisoned *retrieved document* can override system instructions the model never saw from the user directly |
-| **Agentic Tool-Caller** | `target/agentic_target.py` | LLM03 | Whether a conversational message alone can trigger an unauthorized fund transfer or a raw-SQL admin tool call |
+| **Agentic Tool-Caller** | `target/agentic_target.py` | LLM06 | Whether a conversational message alone can trigger an unauthorized fund transfer or a raw-SQL admin tool call |
 
 All three run fully offline by default via deterministic simulators (zero API cost, fully reproducible for CI).
 Pass `--live` to route any of them through a real OpenAI model for a genuine audit.
@@ -69,7 +69,7 @@ Both modes funnel through the exact same Gate 1 -> Gate 2 -> `ResilienceScorer` 
           (XML Boundary Isolation)     (FastAPI Regex Firewall)
 ```
 
-## OWASP LLM Top 10 Coverage
+## OWASP LLM Top 10 (2025) Coverage
 
 | Probe ID | Attack Vector | Target | OWASP Category | Severity |
 |---|---|---|---|---|
@@ -84,8 +84,8 @@ Both modes funnel through the exact same Gate 1 -> Gate 2 -> `ResilienceScorer` 
 | PRB-009 | Nested Narrative Simulation | MOCK | LLM01 | HIGH |
 | PRB-010 | Maintenance Daemon Inversion | MOCK | LLM01 | CRITICAL |
 | PRB-011 | Indirect RAG Document Poisoning | RAG | LLM08 | CRITICAL |
-| PRB-012 | Unauthorized Fund Transfer | AGENTIC | LLM03 | CRITICAL |
-| PRB-013 | Raw SQL Tool Parameter Injection | AGENTIC | LLM03 | CRITICAL |
+| PRB-012 | Unauthorized Fund Transfer | AGENTIC | LLM06 | CRITICAL |
+| PRB-013 | Raw SQL Tool Parameter Injection | AGENTIC | LLM06 | CRITICAL |
 
 ## Mathematical Formulation
 
