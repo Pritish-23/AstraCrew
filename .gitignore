@@ -221,5 +221,9 @@ __marimo__/
 reports/*.json
 reports/*.pdf
 
+# Custom target configs with sensitive credentials
+config/*_private.json
+config/*.secret.json
+
 tieredflow.db
 .claude

@@ -16,6 +16,7 @@ class TargetType(str, Enum):
     MOCK = "MOCK"
     RAG = "RAG"
     AGENTIC = "AGENTIC"
+    CUSTOM = "CUSTOM"
 
 
 class AttackSeverity(str, Enum):
@@ -33,7 +34,7 @@ class AttackProbeExecution(BaseModel):
     probe_name: str
     owasp_category: str
     severity_level: Literal["INFORMATIONAL", "LOW", "MEDIUM", "HIGH", "CRITICAL"]
-    target_type: Literal["MOCK", "RAG", "AGENTIC"] = "MOCK"
+    target_type: Literal["MOCK", "RAG", "AGENTIC", "CUSTOM"] = "MOCK"
     injected_payload: str
     target_response: str
 
@@ -67,6 +68,27 @@ class AuditConfiguration(BaseModel):
     model_name: str = "gpt-4o-mini"
     min_resilience: float = Field(70.0, ge=0.0, le=100.0)
     execution_mode: Literal["deterministic", "crew"] = "deterministic"
+
+
+class CustomTargetConfig(BaseModel):
+    """Configuration for testing a custom HTTP endpoint."""
+
+    endpoint_url: str = Field(..., description="User's LLM API endpoint")
+    auth_type: Literal["none", "bearer", "api_key", "basic"] = "none"
+    auth_value: str | None = None
+
+    # Request configuration
+    http_method: Literal["POST", "GET"] = "POST"
+    payload_field: str = "message"
+    extra_headers: dict[str, str] = Field(default_factory=dict)
+
+    # Response configuration
+    response_field: str = "response"
+    timeout_seconds: int = 30
+
+    # Optional: help users understand what the target is
+    application_name: str = "Custom Application"
+    application_domain: str = "Custom Domain"
 
 
 class AstraCrewAuditReport(BaseModel):

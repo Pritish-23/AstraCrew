@@ -30,6 +30,7 @@ from remediation.prompt_patcher import PromptPatcher
 from schemas.models import (
     AstraCrewAuditReport,
     AttackProbeExecution,
+    CustomTargetConfig,
     GateEvaluationResult,
 )
 from tools import probe_tools
@@ -45,14 +46,19 @@ class AstraAuditOrchestrator:
         use_live_llm: bool = False,
         model_name: str = "gpt-4o-mini",
         target_types: list[str] | None = None,
+        custom_target_config: CustomTargetConfig | None = None,
     ):
         self.canary_token = canary_token
         self.use_live_llm = use_live_llm
         self.model_name = model_name
         self.target_types = target_types or ["MOCK", "RAG", "AGENTIC"]
+        self.custom_target_config = custom_target_config
 
         self.client = TargetClient(
-            canary_token=canary_token, use_live_llm=use_live_llm, model_name=model_name
+            canary_token=canary_token,
+            use_live_llm=use_live_llm,
+            model_name=model_name,
+            custom_config=custom_target_config,
         )
         self.gate_two = GateTwoArbiter(model=model_name)
 

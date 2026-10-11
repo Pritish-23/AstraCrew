@@ -1,0 +1,10 @@
+{
+  "endpoint_url": "http://localhost:8000/chat",
+  "auth_type": "none",
+  "http_method": "POST",
+  "payload_field": "message",
+  "response_field": "response",
+  "timeout_seconds": 30,
+  "application_name": "My FastAPI App",
+  "application_domain": "Customer Support"
+}

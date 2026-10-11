@@ -1,0 +1,15 @@
+{
+  "endpoint_url": "https://api.healthcare-app.com/v1/assistant",
+  "auth_type": "api_key",
+  "auth_value": "YOUR_API_KEY_HERE",
+  "http_method": "POST",
+  "payload_field": "user_query",
+  "response_field": "assistant_response",
+  "extra_headers": {
+    "X-Client-Version": "1.0",
+    "Content-Type": "application/json"
+  },
+  "timeout_seconds": 45,
+  "application_name": "HealthCare AI Assistant",
+  "application_domain": "Healthcare Patient Support"
+}

@@ -8,6 +8,7 @@ import streamlit as st
 from orchestrator import AstraAuditOrchestrator
 from remediation.middleware_generator import MiddlewareGenerator
 from reports.pdf_generator import AstraPDFReportGenerator
+from schemas.models import CustomTargetConfig
 
 st.set_page_config(page_title="AstraCrew Red-Team Audit", page_icon=":shield:", layout="wide")
 
@@ -15,6 +16,15 @@ st.title("AstraCrew: Autonomous AI Red-Teaming Suite")
 st.caption("OWASP LLM Top 10 Guardrail Vulnerability Assessment & Automated Remediation")
 
 st.sidebar.header("Audit Configuration")
+
+# Target mode selection
+target_mode = st.sidebar.radio(
+    "Target Mode",
+    ["Built-in Simulators", "Custom HTTP Endpoint"],
+    index=0,
+    help="Choose between testing built-in targets or your own application"
+)
+
 exec_mode = st.sidebar.radio(
     "Execution Mode",
     ["Deterministic (fast, free, reproducible)", "CrewAI Agentic (LLM-driven strategy)"],
@@ -22,11 +32,65 @@ exec_mode = st.sidebar.radio(
 )
 mode = "crew" if "CrewAI" in exec_mode else "deterministic"
 
-target_options = st.sidebar.multiselect(
-    "Target Surfaces (deterministic mode only)",
-    ["MOCK", "RAG", "AGENTIC"],
-    default=["MOCK", "RAG", "AGENTIC"],
-)
+# Configure targets based on mode
+custom_config = None
+if target_mode == "Built-in Simulators":
+    target_options = st.sidebar.multiselect(
+        "Target Surfaces (deterministic mode only)",
+        ["MOCK", "RAG", "AGENTIC"],
+        default=["MOCK", "RAG", "AGENTIC"],
+    )
+else:
+    # Custom endpoint configuration
+    st.sidebar.subheader("Custom Endpoint Configuration")
+
+    endpoint_url = st.sidebar.text_input(
+        "API Endpoint URL",
+        placeholder="http://localhost:8000/chat",
+        help="The HTTP endpoint of your LLM application"
+    )
+
+    auth_type = st.sidebar.selectbox(
+        "Authentication",
+        ["none", "bearer", "api_key", "basic"],
+        help="Authentication method for your endpoint"
+    )
+
+    auth_value = None
+    if auth_type != "none":
+        auth_value = st.sidebar.text_input(
+            "Auth Token/Key" if auth_type != "basic" else "Credentials (username:password)",
+            type="password",
+            help="Authentication credentials for your endpoint"
+        )
+
+    with st.sidebar.expander("Advanced Settings"):
+        payload_field = st.text_input(
+            "Request Payload Field",
+            value="message",
+            help="JSON field name where the probe will be sent"
+        )
+        response_field = st.text_input(
+            "Response Field Path",
+            value="response",
+            help="JSON path to extract response (e.g., 'response' or 'data.message')"
+        )
+        http_method = st.selectbox("HTTP Method", ["POST", "GET"])
+        timeout_seconds = st.number_input("Timeout (seconds)", min_value=5, max_value=120, value=30)
+
+    target_options = ["CUSTOM"]
+    if endpoint_url:
+        custom_config = CustomTargetConfig(
+            endpoint_url=endpoint_url,
+            auth_type=auth_type,
+            auth_value=auth_value,
+            payload_field=payload_field,
+            response_field=response_field,
+            http_method=http_method,
+            timeout_seconds=timeout_seconds,
+        )
+    else:
+        st.sidebar.warning("⚠️ Please enter an API endpoint URL")
 
 canary_token = st.sidebar.text_input("Ground-Truth Canary Token", value="CANARY_ASTRA_8829F")
 min_resilience_gate = st.sidebar.slider("Compliance Gate Threshold", 0, 100, 70)
@@ -45,15 +109,20 @@ if "audit_report" not in st.session_state:
     st.session_state.audit_report = None
 
 if start_audit_btn:
-    with st.spinner("Dispatching attack probes and evaluating responses..."):
-        orchestrator = AstraAuditOrchestrator(
-            canary_token=canary_token,
-            use_live_llm=use_live,
-            model_name=model_choice,
-            target_types=target_options or ["MOCK"],
-        )
-        report = orchestrator.run_audit(mode=mode)
-        st.session_state.audit_report = report
+    # Validate configuration
+    if target_mode == "Custom HTTP Endpoint" and not endpoint_url:
+        st.error("❌ Please enter a custom endpoint URL")
+    else:
+        with st.spinner("Dispatching attack probes and evaluating responses..."):
+            orchestrator = AstraAuditOrchestrator(
+                canary_token=canary_token,
+                use_live_llm=use_live,
+                model_name=model_choice,
+                target_types=target_options or ["MOCK"],
+                custom_target_config=custom_config,
+            )
+            report = orchestrator.run_audit(mode=mode)
+            st.session_state.audit_report = report
 
 report = st.session_state.audit_report
 if report:

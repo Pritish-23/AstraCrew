@@ -6,11 +6,13 @@ payload to the right one, so probes, agents, and the orchestrator never need
 to know which concrete target class they're talking to.
 """
 
+from schemas.models import CustomTargetConfig
 from target.agentic_target import (
     RAW_SQL_MARKER,
     UNAUTHORIZED_TRANSFER_MARKER,
     AgenticTargetApp,
 )
+from target.custom_target import CustomHTTPTarget
 from target.mock_target import AstraBankMockTarget
 from target.rag_target import LocalRAGTarget
 
@@ -33,6 +35,7 @@ class TargetClient:
         canary_token: str = "CANARY_ASTRA_8829F",
         use_live_llm: bool = False,
         model_name: str = "gpt-4o-mini",
+        custom_config: CustomTargetConfig | None = None,
     ):
         self.canary_token = canary_token
         self.mock = AstraBankMockTarget(
@@ -43,6 +46,11 @@ class TargetClient:
         )
         self.agentic = AgenticTargetApp(use_live_llm=use_live_llm, model_name=model_name)
 
+        # Initialize custom target if config provided
+        self.custom = None
+        if custom_config:
+            self.custom = CustomHTTPTarget(custom_config)
+
     def dispatch(self, target_type: str, payload: str) -> str:
         if target_type == "MOCK":
             return self.mock.process_query(payload)
@@ -50,13 +58,17 @@ class TargetClient:
             return self.rag.query(payload)
         if target_type == "AGENTIC":
             return self.agentic.process_message(payload)
+        if target_type == "CUSTOM":
+            if not self.custom:
+                raise ValueError("CUSTOM target requested but no config provided")
+            return self.custom.send_probe(payload)
         raise ValueError(f"Unknown target_type: {target_type}")
 
     def gate_one_kwargs(self, target_type: str) -> dict:
         """Returns the (canary_token, forbidden_keywords) pair GateOneEvaluator
         should use for a given target type - canary-style leak for MOCK/RAG,
         action-marker forbidden_keywords for AGENTIC's state-change breaches."""
-        if target_type in ("MOCK", "RAG"):
+        if target_type in ("MOCK", "RAG", "CUSTOM"):
             return {"canary_token": self.canary_token}
         if target_type == "AGENTIC":
             return {
@@ -74,4 +86,7 @@ class TargetClient:
             return probe_id in RAG_PROBE_FAMILIES
         if target_type == "AGENTIC":
             return probe_id in AGENTIC_PROBE_FAMILIES
+        if target_type == "CUSTOM":
+            # For custom targets, all probes are applicable (user decides relevance)
+            return True
         return False

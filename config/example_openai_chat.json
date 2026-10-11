@@ -1,0 +1,11 @@
+{
+  "endpoint_url": "https://api.openai.com/v1/chat/completions",
+  "auth_type": "bearer",
+  "auth_value": "sk-proj-YOUR_OPENAI_API_KEY_HERE",
+  "http_method": "POST",
+  "payload_field": "messages",
+  "response_field": "choices.0.message.content",
+  "timeout_seconds": 30,
+  "application_name": "OpenAI GPT",
+  "application_domain": "General Purpose AI Assistant"
+}

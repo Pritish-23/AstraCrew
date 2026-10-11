@@ -2,11 +2,13 @@
 AstraCrew: Production Command-Line Interface (CLI) & CI/CD Gate
 """
 import argparse
+import json
 import os
 import sys
 
 from orchestrator import AstraAuditOrchestrator
 from reports.pdf_generator import AstraPDFReportGenerator
+from schemas.models import CustomTargetConfig
 
 
 def parse_arguments() -> argparse.Namespace:
@@ -35,6 +37,59 @@ def parse_arguments() -> argparse.Namespace:
                              "probe IDs that the built-in (deliberately vulnerable) simulators MUST "
                              "breach, and that no other probe may breach. Verifies detection integrity "
                              "instead of grading the fixture's (intentionally poor) security posture.")
+
+    # Custom target arguments
+    custom_group = parser.add_argument_group('Custom Target Configuration')
+    custom_group.add_argument(
+        "--custom-endpoint",
+        type=str,
+        help="URL of your LLM application endpoint (e.g., http://localhost:8000/chat). "
+             "When provided, automatically sets --targets to CUSTOM unless explicitly overridden."
+    )
+    custom_group.add_argument(
+        "--custom-auth-type",
+        type=str,
+        choices=["none", "bearer", "api_key", "basic"],
+        default="none",
+        help="Authentication type for custom endpoint."
+    )
+    custom_group.add_argument(
+        "--custom-auth-value",
+        type=str,
+        help="Authentication token/key/credentials. For basic auth, use 'username:password' format."
+    )
+    custom_group.add_argument(
+        "--custom-payload-field",
+        type=str,
+        default="message",
+        help="JSON field name where probe payload should be sent in the request body."
+    )
+    custom_group.add_argument(
+        "--custom-response-field",
+        type=str,
+        default="response",
+        help="JSON path to extract response text (e.g., 'response' or 'data.message')."
+    )
+    custom_group.add_argument(
+        "--custom-http-method",
+        type=str,
+        choices=["POST", "GET"],
+        default="POST",
+        help="HTTP method for custom endpoint requests."
+    )
+    custom_group.add_argument(
+        "--custom-timeout",
+        type=int,
+        default=30,
+        help="Request timeout in seconds for custom endpoint."
+    )
+    custom_group.add_argument(
+        "--custom-config-file",
+        type=str,
+        help="Path to JSON file with full custom target configuration. "
+             "If provided, overrides all other --custom-* flags."
+    )
+
     return parser.parse_args()
 
 
@@ -43,7 +98,33 @@ def main() -> None:
     os.makedirs(os.path.dirname(args.export_json) or ".", exist_ok=True)
     os.makedirs(os.path.dirname(args.export_pdf) or ".", exist_ok=True)
 
+    # Build custom target config if provided
+    custom_config = None
+    if args.custom_config_file:
+        # Load from JSON file
+        with open(args.custom_config_file, encoding="utf-8") as f:
+            config_data = json.load(f)
+        custom_config = CustomTargetConfig(**config_data)
+        print(f"[*] Loaded custom target config from: {args.custom_config_file}")
+    elif args.custom_endpoint:
+        # Build from CLI args
+        custom_config = CustomTargetConfig(
+            endpoint_url=args.custom_endpoint,
+            auth_type=args.custom_auth_type,
+            auth_value=args.custom_auth_value,
+            payload_field=args.custom_payload_field,
+            response_field=args.custom_response_field,
+            http_method=args.custom_http_method,
+            timeout_seconds=args.custom_timeout,
+        )
+        print(f"[*] Custom endpoint configured: {args.custom_endpoint}")
+
     target_types = [t.strip().upper() for t in args.targets.split(",") if t.strip()]
+
+    # If custom endpoint provided and user didn't explicitly set targets, default to CUSTOM
+    if custom_config and args.targets == "MOCK,RAG,AGENTIC":  # default value
+        target_types = ["CUSTOM"]
+        print("[*] Auto-selecting CUSTOM target (override with --targets if needed)")
 
     print("=" * 68)
     print(" ASTRA-CREW: AUTONOMOUS AI RED-TEAMING & SECURITY AUDIT ")
@@ -56,7 +137,11 @@ def main() -> None:
     print("-" * 68)
 
     orchestrator = AstraAuditOrchestrator(
-        canary_token=args.canary, use_live_llm=args.live, model_name=args.model, target_types=target_types
+        canary_token=args.canary,
+        use_live_llm=args.live,
+        model_name=args.model,
+        target_types=target_types,
+        custom_target_config=custom_config,
     )
     report = orchestrator.run_audit(mode=args.mode)
 

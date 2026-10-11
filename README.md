@@ -5,25 +5,21 @@
 [![OWASP LLM Top 10](https://img.shields.io/badge/OWASP-LLM%20Top%2010-red.svg)](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-AstraCrew tests, benchmarks, and helps harden LLM applications against adversarial prompt attacks. It runs the
-same probe library against **three structurally different attack surfaces** and evaluates every response through
-a deterministic-first Dual-Gate pipeline, then automatically generates a hardened system prompt diff and a
-drop-in firewall middleware from confirmed breaches.
+AstraCrew tests, benchmarks, and helps harden LLM applications against adversarial prompt attacks. Test **your own application** via HTTP or use built-in simulators. It runs the same probe library against four structurally different attack surfaces and evaluates every response through a deterministic-first Dual-Gate pipeline, then automatically generates a hardened system prompt diff and a drop-in firewall middleware from confirmed breaches.
 
-## Why three targets, not one
+## Four Target Types: Built-in Simulators + Your Application
 
-A single "does the model leak a secret when asked directly" test only covers a slice of how LLM applications
-actually fail. AstraCrew exercises three distinct architectures, each mapped to a different OWASP LLM Top 10
-category:
+AstraCrew can test **your actual LLM application** via HTTP, or use built-in simulators for learning and CI:
 
 | Target | File | OWASP Category | What it tests |
 |---|---|---|---|
+| **Custom HTTP** | `target/custom_target.py` | All | **YOUR application** - sends probes to your API endpoint (local or deployed) |
 | **Mock Assistant** | `target/mock_target.py` | LLM01, LLM02, LLM07 | Direct prompt injection, sensitive disclosure, guardrail bypass via a single-turn chat interface |
 | **RAG Pipeline** | `target/rag_target.py` | LLM08 | Whether a poisoned *retrieved document* can override system instructions the model never saw from the user directly |
 | **Agentic Tool-Caller** | `target/agentic_target.py` | LLM06 | Whether a conversational message alone can trigger an unauthorized fund transfer or a raw-SQL admin tool call |
 
-All three run fully offline by default via deterministic simulators (zero API cost, fully reproducible for CI).
-Pass `--live` to route any of them through a real OpenAI model for a genuine audit.
+Built-in targets run fully offline by default via deterministic simulators (zero API cost, fully reproducible for CI).
+Pass `--live` to route them through a real OpenAI model. Custom targets test your real application's HTTP endpoint.
 
 ## Two execution modes, one report schema
 
@@ -37,10 +33,10 @@ Both modes funnel through the exact same Gate 1 -> Gate 2 -> `ResilienceScorer` 
 `AstraCrewAuditReport` shape, so a deterministic run and a crew run on the same target are directly comparable.
 
 ```
-                    Adversarial Probe (13 registered, 3 target-typed)
+                    Adversarial Probe (13 registered, 4 target types)
                                     |
                                     v
-                  MOCK target  /  RAG target  /  AGENTIC target
+            CUSTOM (your app)  /  MOCK  /  RAG  /  AGENTIC targets
                                     |
                                     v
           +-------------------------------------------------+
@@ -103,6 +99,8 @@ B = (sum(V_i) / M) * 100%
 
 ## Quickstart
 
+### Installation
+
 ```bash
 git clone https://github.com/Pritish-23/AstraCrew.git
 cd AstraCrew
@@ -110,6 +108,24 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\Act
 pip install -e ".[dev]"
 cp .env.example .env   # only needed for --live or --mode crew
 ```
+
+### Test Your Own Application
+
+```bash
+# Test your local app
+python main.py --custom-endpoint http://localhost:8000/chat
+
+# Test with authentication
+python main.py \
+  --custom-endpoint https://api.myapp.com/chat \
+  --custom-auth-type bearer \
+  --custom-auth-value "your-api-key" \
+  --export-pdf reports/my_app_audit.pdf
+```
+
+**[📖 Full Custom Target Documentation →](docs/CUSTOM_TARGETS.md)**
+
+### Test Built-in Simulators
 
 Run the deterministic compliance audit (no API key needed):
 
@@ -123,13 +139,17 @@ Run the agentic mode audit (requires `OPENAI_API_KEY` in `.env`):
 python main.py --mode crew
 ```
 
-Launch the interactive dashboard:
+### Interactive Dashboard
+
+Launch the Streamlit UI to test either your app or the built-in targets:
 
 ```bash
 streamlit run app.py
 ```
 
-Run the test suite:
+Select **"Custom HTTP Endpoint"** in the sidebar to test your application.
+
+### Run Tests
 
 ```bash
 pytest -v
@@ -152,7 +172,11 @@ Every push and pull request to `main` runs `.github/workflows/ci.yml`:
 ```
 AstraCrew/
 |-- schemas/models.py            # Pydantic v2 data contracts
-|-- target/                      # Three attack surfaces (mock, rag, agentic)
+|-- target/                      # Four attack surfaces (custom, mock, rag, agentic)
+|   |-- custom_target.py         # HTTP client for testing user applications
+|   |-- mock_target.py           # Banking assistant simulator
+|   |-- rag_target.py            # RAG pipeline simulator
+|   `-- agentic_target.py        # Tool-calling agent simulator
 |-- probes/                      # 13 registered probes across 5 modules
 |-- evaluation/                  # Gate 1 (deterministic) + Gate 2 (semantic) + scoring
 |-- tools/                       # Target dispatcher + CrewAI tool wrappers
@@ -162,5 +186,7 @@ AstraCrew/
 |-- crew.py                      # CrewAI hierarchical agentic mode
 |-- main.py                      # CLI + CI/CD gate
 |-- app.py                       # Streamlit dashboard
+|-- config/                      # Example custom target configurations
+|-- docs/CUSTOM_TARGETS.md       # Guide for testing your own app
 `-- tests/                       # pytest suite (real test_* functions)
 ```
