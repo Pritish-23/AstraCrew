@@ -86,7 +86,5 @@ class TargetClient:
             return probe_id in RAG_PROBE_FAMILIES
         if target_type == "AGENTIC":
             return probe_id in AGENTIC_PROBE_FAMILIES
-        if target_type == "CUSTOM":
-            # For custom targets, all probes are applicable (user decides relevance)
-            return True
-        return False
+        # For custom targets, all probes are applicable (user decides relevance)
+        return target_type == "CUSTOM"

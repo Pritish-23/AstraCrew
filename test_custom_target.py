@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Simple test script to verify custom target implementation.
 Run this after activating your virtual environment with dependencies installed.
@@ -8,22 +7,20 @@ def test_imports():
     """Test that all new modules can be imported."""
     print("Testing imports...")
     try:
-        from schemas.models import CustomTargetConfig, TargetType
+        from orchestrator import AstraAuditOrchestrator  # noqa: F401
+        from schemas.models import CustomTargetConfig, TargetType  # noqa: F401
+        from target.custom_target import CustomHTTPTarget  # noqa: F401
+        from tools.target_client import TargetClient  # noqa: F401
+
         print("  ✓ CustomTargetConfig imported")
         print("  ✓ TargetType enum imported")
-
-        from target.custom_target import CustomHTTPTarget
         print("  ✓ CustomHTTPTarget imported")
-
-        from tools.target_client import TargetClient
         print("  ✓ TargetClient imported")
-
-        from orchestrator import AstraAuditOrchestrator
         print("  ✓ AstraAuditOrchestrator imported")
 
         print("\n✅ All imports successful!")
         return True
-    except Exception as e:
+    except ImportError as e:
         print(f"\n❌ Import failed: {e}")
         return False
 
@@ -50,7 +47,7 @@ def test_custom_target_config():
         print(f"  ✓ Auth type: {config.auth_type}")
 
         return True
-    except Exception as e:
+    except (ImportError, ValueError, TypeError) as e:
         print(f"  ❌ Config test failed: {e}")
         return False
 
@@ -68,7 +65,7 @@ def test_target_type_enum():
         print(f"  ✓ Available target types: {', '.join(all_types)}")
 
         return True
-    except Exception as e:
+    except (ImportError, AttributeError) as e:
         print(f"  ❌ Enum test failed: {e}")
         return False
 
@@ -77,17 +74,13 @@ def test_cli_help():
     """Test that CLI has new custom endpoint flags."""
     print("\nTesting CLI flags...")
     try:
-        import main
-        import argparse
-
-        # Parse help to check if custom flags exist
-        parser = main.parse_arguments.__code__.co_consts
+        import main  # noqa: F401
 
         print("  ✓ main.py imports successfully")
         print("  ℹ️  Run 'python main.py --help' to see all custom flags")
 
         return True
-    except Exception as e:
+    except ImportError as e:
         print(f"  ❌ CLI test failed: {e}")
         return False
 
