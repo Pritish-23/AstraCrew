@@ -65,14 +65,16 @@ class AstraAuditOrchestrator:
     # ------------------------------------------------------------------
     # Shared evaluation pipeline (used by both execution modes)
     # ------------------------------------------------------------------
-    def _evaluate(self, target_type: str, probe_id: str, response_text: str) -> GateEvaluationResult:
+    def _evaluate(
+        self, target_type: str, probe_id: str, response_text: str, injected_payload: str = ""
+    ) -> GateEvaluationResult:
         gate_one = GateOneEvaluator(**self.client.gate_one_kwargs(target_type))
         verdict = gate_one.evaluate(probe_id, response_text)
         if verdict.gate_triggered == "NONE":
             try:
                 verdict = self.gate_two.evaluate(
                     probe_id=probe_id,
-                    injected_payload="",
+                    injected_payload=injected_payload,
                     target_response=response_text,
                 )
             except Exception as err:  # noqa: BLE001
@@ -170,7 +172,7 @@ class AstraAuditOrchestrator:
                         target_response=target_response,
                     )
                 )
-                evaluations.append(self._evaluate(target_type, probe.probe_id, target_response))
+                evaluations.append(self._evaluate(target_type, probe.probe_id, target_response, payload))
 
         return self._compile_report(target_display_name, "deterministic", probe_executions, evaluations)
 
@@ -207,7 +209,12 @@ class AstraAuditOrchestrator:
                 )
             )
             evaluations.append(
-                self._evaluate(record["target_type"], record["probe_id"], record["target_response"])
+                self._evaluate(
+                    record["target_type"],
+                    record["probe_id"],
+                    record["target_response"],
+                    record["injected_payload"],
+                )
             )
 
         target_display_name = target_name or "AstraBank Suite [CrewAI Hierarchical Agentic Audit]"

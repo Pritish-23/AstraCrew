@@ -2,7 +2,7 @@ from typing import Any
 
 from probes.base_probe import BaseProbe, ProbeRegistry
 
-_ALL_TARGETS = ["MOCK", "RAG", "AGENTIC"]
+_ALL_TARGETS = ["MOCK", "RAG", "AGENTIC", "CUSTOM"]
 
 
 @ProbeRegistry.register

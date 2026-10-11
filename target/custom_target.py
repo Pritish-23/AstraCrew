@@ -74,6 +74,8 @@ class CustomHTTPTarget:
         for key in keys:
             if isinstance(value, dict):
                 value = value.get(key, "")
+            elif isinstance(value, list) and key.isdigit() and int(key) < len(value):
+                value = value[int(key)]
             else:
                 return ""
 
