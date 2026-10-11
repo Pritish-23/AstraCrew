@@ -7,9 +7,10 @@ def test_imports():
     """Test that all new modules can be imported."""
     print("Testing imports...")
     try:
+        from target.custom_target import CustomHTTPTarget  # noqa: F401
+
         from orchestrator import AstraAuditOrchestrator  # noqa: F401
         from schemas.models import CustomTargetConfig, TargetType  # noqa: F401
-        from target.custom_target import CustomHTTPTarget  # noqa: F401
         from tools.target_client import TargetClient  # noqa: F401
 
         print("  ✓ CustomTargetConfig imported")
