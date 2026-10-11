@@ -26,11 +26,10 @@ class CustomHTTPTarget:
             self.session.headers["Authorization"] = f"Bearer {self.config.auth_value}"
         elif self.config.auth_type == "api_key" and self.config.auth_value:
             self.session.headers["X-API-Key"] = self.config.auth_value
-        elif self.config.auth_type == "basic" and self.config.auth_value:
+        elif self.config.auth_type == "basic" and self.config.auth_value and ":" in self.config.auth_value:
             # Expecting format "username:password"
-            if ":" in self.config.auth_value:
-                username, password = self.config.auth_value.split(":", 1)
-                self.session.auth = HTTPBasicAuth(username, password)
+            username, password = self.config.auth_value.split(":", 1)
+            self.session.auth = HTTPBasicAuth(username, password)
 
     def _setup_headers(self) -> None:
         """Add extra headers from config."""

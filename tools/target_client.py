@@ -6,14 +6,13 @@ payload to the right one, so probes, agents, and the orchestrator never need
 to know which concrete target class they're talking to.
 """
 
-from target.custom_target import CustomHTTPTarget
-
 from schemas.models import CustomTargetConfig
 from target.agentic_target import (
     RAW_SQL_MARKER,
     UNAUTHORIZED_TRANSFER_MARKER,
     AgenticTargetApp,
 )
+from target.custom_target import CustomHTTPTarget
 from target.mock_target import AstraBankMockTarget
 from target.rag_target import LocalRAGTarget
 
